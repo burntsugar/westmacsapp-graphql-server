@@ -1,7 +1,15 @@
-require('dotenv').config()
-const pgPromise = require('pg-promise');
+/*
+ * @Author: rrr@burntsugar.rocks 
+ * @Date: 2020-02-18 09:17:12 
+ * @Last Modified by: rrr@burntsugar.rocks
+ * @Last Modified time: 2020-02-18 16:58:51
+ */
 
-const pgp = pgPromise({}); 
+import 'dotenv/config';
+
+import pgPromise from 'pg-promise';
+
+const pgp = pgPromise({});
 
 const config = {
     host: process.env.POSTGRES_HOST,
@@ -13,9 +21,10 @@ const config = {
 
 const db = pgp(config);
 
-exports.db = db;
-
 db.one('select * from locations WHERE id = 1')
     .then(res => {
+        console.log('Tezting... ');
         console.log(res);
     });
+
+export { db };
