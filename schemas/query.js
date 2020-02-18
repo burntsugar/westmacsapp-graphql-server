@@ -1,6 +1,13 @@
-const { db } = require("../pgAdaptor");
-const { GraphQLObjectType, GraphQLID } = require("graphql");
-const { LocationType } = require("./types");
+/*
+ * @Author: rrr@burntsugar.rocks 
+ * @Date: 2020-02-18 09:18:26 
+ * @Last Modified by: rrr@burntsugar.rocks
+ * @Last Modified time: 2020-02-18 16:57:30
+ */
+
+import { db } from '../pgAdaptor';
+import { GraphQLObjectType, GraphQLID, GraphQLList } from 'graphql';
+import { LocationType, PlaceType, CampsiteType, CampsiteFacilitiesType } from './types';
 
 const RootQuery = new GraphQLObjectType({
     name: "RootQueryType",
@@ -9,17 +16,68 @@ const RootQuery = new GraphQLObjectType({
         location: {
             type: LocationType,
             args: { id: { type: GraphQLID } },
-            resolve(parentValue, args) {
+            async resolve(parentValue, args) {
                 const query = `SELECT * FROM locations WHERE id=$1`;
                 const values = [args.id];
-
-                return db
-                    .one(query, values)
-                    .then(res => res)
-                    .catch(err => err);
+                try {
+                    const res = await db
+                        .one(query, values);
+                    return res;
+                }
+                catch (err) {
+                    return err;
+                }
+            }
+        },
+        place: {
+            type: PlaceType,
+            args: { id: { type: GraphQLID } },
+            async resolve(parentValue, args) {
+                const query = `SELECT * FROM places WHERE id=$1`;
+                const values = [args.id];
+                try {
+                    const res = await db
+                        .one(query, values);
+                    return res;
+                }
+                catch (err) {
+                    return err;
+                }
+            }
+        },
+        campsite: {
+            type: CampsiteType,
+            args: { id: { type: GraphQLID } },
+            async resolve(parentValue, args) {
+                const query = `SELECT * FROM campsites WHERE id=$1`;
+                const values = [args.id];
+                try {
+                    const res = await db
+                        .one(query, values);
+                    return res;
+                }
+                catch (err) {
+                    return err;
+                }
+            }
+        },
+        campsite_facilities: {
+            type: new GraphQLList(CampsiteFacilitiesType),
+            args: { csid: { type: GraphQLID } },
+            async resolve(parentValue, args) {
+                const query = `SELECT * FROM csdesc1 WHERE csid=$1`;
+                const values = [args.csid];
+                try {
+                    const res = await db
+                        .many(query, values);
+                    return res;
+                }
+                catch (err) {
+                    return err;
+                }
             }
         }
     }
 });
 
-exports.query = RootQuery;
+export { RootQuery as query };
